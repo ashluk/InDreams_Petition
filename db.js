@@ -7,7 +7,7 @@ const db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
 
 //we are going to want to export our functions
 module.exports.getSignatures = () => {
-    const q = `SELECT * FROM petition`;
+    const q = `SELECT * FROM signatures`;
     return db.query(q);
 };
 

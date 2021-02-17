@@ -4,6 +4,14 @@ const db = require("./db");
 
 console.log("db", db);
 
+app.use(express.static("public"));
+
+app.get("/petition", (req, res) => {
+    res.render("/petition", {});
+});
+
+app.listen(8080, () => console.log("Petition up and running...."));
+
 /*db.addCity("York", "UK", 500000)
     .then(({ rows }) => {
         console.log("rows", rows);
@@ -16,5 +24,3 @@ console.log("db", db);
         console.log("result", result);
     })
     .catch((err) => console.log(err));*/
-
-app.listen(8080, () => console.log("Petition up and running...."));
