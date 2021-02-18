@@ -11,13 +11,14 @@ module.exports.getSignatures = () => {
     return db.query(q);
 };
 
-/*module.exports.addCity = (city, country, population) => {
-    const q = `INSERT INTO mydatabase (city, country, population)
-            values($1, $2, $3)
+module.exports.addSignature = (first, last, signature) => {
+    const q = `INSERT INTO signatures (first, last, signature)
+            values(${first},${last}, ${signature})
             RETURNING id
     `;
-    return db.query(q, params);
+    return db.query(q);
 };
-const params = [city, country, population];*/
+
+//const params = [first, last, signature];
 
 //  the $1,$2...are replacing this --- values (${city}, ${country}, ${population})
