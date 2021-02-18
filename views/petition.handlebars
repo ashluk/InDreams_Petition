@@ -1,3 +1,4 @@
+<form method="POST">
 <body>
     <form action="/petition" method="post">
  <ul>
@@ -9,10 +10,18 @@
     <label for="last">Last:</label>
     <input type="text" id="last" name="user_last">
   </li>
+  
+      <canvas id='signature' width="600" height="200">signature here</canvas>
+
+ 
   <li>
-      <canvas id='signature'>signature here</canvas>
+    <input type="submit" value="submit">
+        <!---  <button type="button" class="button clear" data-action="clear">clear</button>
+                  <button type="sumbit" class="submit" data-action="submit">submit</button> -->
+
   </li>
  </ul>
 </form>
-<button> SUBMIT </button>  
+<!--<button> SUBMIT </button>  -->
 </body>
+</form>
