@@ -1,6 +1,7 @@
 //console.log($'hello');
 const signature = document.getElementById("signature");
 const context = signature.getContext("2d");
+const hidden = document.getElementById("hiddenSignature"); //hidden is where we will store the value of the signature
 var dataURL;
 /*const clear = document.getElementById("clear");*/
 //const submit = document.getElementById("submit");
@@ -31,7 +32,8 @@ window.addEventListener("mouseup", (e) => {
         y = 0;
 
         moving = false;
-        var dataUrl = signature.toDataURL();
+        var dataURL = signature.toDataURL();
+        hidden.value = dataURL;
         console.log("this is my dataURL", dataURL);
     }
 });

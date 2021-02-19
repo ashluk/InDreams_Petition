@@ -8,7 +8,6 @@ const cookieSession = require("cookie-session");
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
-//app.use(express.static(__dirname + "/static"));
 app.use(
     cookieSession({
         secret: `I'm always hungry.`,
@@ -17,6 +16,8 @@ app.use(
 );
 
 console.log("db", db);
+//app.use(express.static(__dirname + "/static"));
+
 app.use(express.static("./public"));
 
 app.use(
@@ -39,11 +40,13 @@ app.get("/petition", (req, res) => {
 });
 
 app.post("/petition", (req, res) => {
-    const { first, last, signature } = req.body;
+    const { user_first, user_last, signature } = req.body;
     console.log("requested body", req.body);
-    db.addSignature(first, last, signature)
+    db.addSignature(user_first, user_last, signature)
         .then(({ rows }) => {
             console.log("rows: ", rows);
+            req.session.signed = true;
+            res.redirect("thanks");
         })
         .catch((err) => console.log("petition error", err));
 });
@@ -51,8 +54,33 @@ app.post("/petition", (req, res) => {
 app.get("/signers", (req, res) => {
     res.render("signers", {});
 });
+
+/*app.get("/thanks", (req, res) => {
+    // const { user_first, user_last, signature } = req.body;
+
+    if (req.session.signed) {
+        db.getCount().then(({ rows }) => {
+        res.render("thanks", {
+            
+            layout: main, rows
+             }
+        });
+    }
+});*/
+
 app.get("/thanks", (req, res) => {
-    res.render("thanks", {});
+    if (req.session.signed) {
+        db.getCount()
+            .then(({ rows }) => {
+                console.log("rows: ", rows);
+                res.render("thanks", {
+                    id: rows,
+                });
+            })
+            .catch((err) => console.log("error in thanks page", err));
+    } else {
+        res.redirect("/petition");
+    }
 });
 app.get("/register", (req, res) => {
     res.render("register", {});

@@ -13,9 +13,22 @@ module.exports.getSignatures = () => {
 
 module.exports.addSignature = (first, last, signature) => {
     const q = `INSERT INTO signatures (first, last, signature)
-            values(${first},${last}, ${signature})
+            values($1, $2, $3)
             RETURNING id
+            
     `;
+    const params = [first, last, signature];
+
+    return db.query(q, params);
+};
+
+module.exports.getCount = () => {
+    const q = `SELECT COUNT(*) FROM signatures`;
+    return db.query(q);
+};
+
+module.exports.getSigners = () => {
+    const q = `SELECT first, last  FROM signatures`;
     return db.query(q);
 };
 
