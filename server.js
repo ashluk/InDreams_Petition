@@ -45,38 +45,45 @@ app.post("/petition", (req, res) => {
     db.addSignature(user_first, user_last, signature)
         .then(({ rows }) => {
             console.log("rows: ", rows);
-            req.session.signed = true;
-            res.redirect("thanks");
+            req.session.signed = rows[0].id;
+
+            res.redirect("/thanks");
         })
         .catch((err) => console.log("petition error", err));
 });
 
 app.get("/signers", (req, res) => {
-    res.render("signers", {});
+    db.getSigners()
+        .then(({ rows }) => {
+            var fullNames = rows;
+            console.log("fullnames", fullNames);
+            res.render("signers", {
+                fullNames,
+            });
+        })
+        .catch((err) => console.log("error in signers page", err));
 });
-
-/*app.get("/thanks", (req, res) => {
-    // const { user_first, user_last, signature } = req.body;
-
-    if (req.session.signed) {
-        db.getCount().then(({ rows }) => {
-        res.render("thanks", {
-            
-            layout: main, rows
-             }
-        });
-    }
-});*/
 
 app.get("/thanks", (req, res) => {
     if (req.session.signed) {
-        db.getCount()
+        db.signatureId(req.session.signed)
             .then(({ rows }) => {
                 console.log("rows: ", rows);
-                res.render("thanks", {
-                    id: rows,
+                var signatureImage = rows[0];
+                console.log("signatureImage", signatureImage);
+                /*res.render("thanks", {
+                    rows,
+                });*/
+                db.getCount().then(({ rows }) => {
+                    var signerNumber = rows[0];
+                    console.log("signerNumber", signerNumber);
+                    res.render("thanks", {
+                        signatureImage,
+                        signerNumber,
+                    });
                 });
             })
+
             .catch((err) => console.log("error in thanks page", err));
     } else {
         res.redirect("/petition");
@@ -85,8 +92,26 @@ app.get("/thanks", (req, res) => {
 app.get("/register", (req, res) => {
     res.render("register", {});
 });
+
+app.post("/register", (req, res) => {
+    const { user_first, user_last, user_email, hash } = req.body;
+    console.log("requested body", req.body);
+    db.addSignature(user_first, user_last, user_email, hash)
+        .then(({ rows }) => {
+            console.log("rows: ", rows);
+            req.session.signed = rows[0].id;
+
+            res.redirect("/thanks");
+        })
+        .catch((err) => console.log("petition error", err));
+});
+
 app.get("/login", (req, res) => {
     res.render("login", {});
+});
+
+app.get("/profile", (req, res) => {
+    res.render("profile", {});
 });
 app.listen(8080, () => console.log("Petition up and running...."));
 

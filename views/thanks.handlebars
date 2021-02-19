@@ -1,7 +1,16 @@
 
 <!--<h3>Thank you for signing, you are number {{>count}}</h3>-->
-{{#rows}}
-<h3>Thank you for signing, you are number {{rows}}</h3>
-{{/rows}}
+{{#signerNumber}}
+<h3>Thank you for signing, you are number {{count}}</h3>
+{{/signerNumber}}
 
-<button>SIGNERS <a href="/signers"></a>   </button>
+{{#signatureImage}}
+<img src="{{signature}}" alt="signature">
+{{/signatureImage}}
+
+<!---{{#rows}}
+<h3> are number {{count}}</h3>
+<img src="{{signature}}" alt="signature">
+{{/rows}}-->
+
+ <a href="/signers"><button>SIGNERS</button></a>   

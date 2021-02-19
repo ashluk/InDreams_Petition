@@ -10,7 +10,8 @@ module.exports.getSignatures = () => {
     const q = `SELECT * FROM signatures`;
     return db.query(q);
 };
-
+//USERS TABLE
+//this will eventually change to USERS add the registration info(first, last, email, password)
 module.exports.addSignature = (first, last, signature) => {
     const q = `INSERT INTO signatures (first, last, signature)
             values($1, $2, $3)
@@ -21,17 +22,24 @@ module.exports.addSignature = (first, last, signature) => {
 
     return db.query(q, params);
 };
-
-module.exports.getCount = () => {
-    const q = `SELECT COUNT(*) FROM signatures`;
-    return db.query(q);
-};
-
+//this will also move to the USERS
 module.exports.getSigners = () => {
     const q = `SELECT first, last  FROM signatures`;
     return db.query(q);
 };
 
-//const params = [first, last, signature];
+//SIGNATURE TABLE
+//this is selecting which number you are on the signatures table
+module.exports.getCount = () => {
+    const q = `SELECT COUNT(*) FROM signatures`;
+    return db.query(q);
+};
+//this gives us the dataURL which in turn we use to make the signature image
+module.exports.signatureId = (sigId) => {
+    const q = `SELECT signature FROM signatures WHERE id = $1`;
+
+    //const q = `SELECT * FROM signatures WHERE id = $1`;
+    return db.query(q, [sigId]);
+};
 
 //  the $1,$2...are replacing this --- values (${city}, ${country}, ${population})
