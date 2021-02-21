@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const db = require("./db");
 const hb = require("express-handlebars");
-//const { hash } = require("bc.js");
+const { hash, compare } = require("./utils/bc.js");
 const cookieSession = require("cookie-session");
 
 app.engine("handlebars", hb());
@@ -16,7 +16,6 @@ app.use(
 );
 
 console.log("db", db);
-//app.use(express.static(__dirname + "/static"));
 
 app.use(express.static("./public"));
 
@@ -26,8 +25,7 @@ app.use(
     })
 );
 
-//app.use(express.static(__dirname + "./public"));
-
+//PETITION ROUTE
 app.get("/petition", (req, res) => {
     if (req.session.signed) {
         res.redirect("/thanks");
@@ -40,17 +38,50 @@ app.get("/petition", (req, res) => {
 });
 
 app.post("/petition", (req, res) => {
-    const { user_first, user_last, signature } = req.body;
+    const { signature } = req.body;
     console.log("requested body", req.body);
-    db.addSignature(user_first, user_last, signature)
+    db.addSignature(signature, req.session.userId)
         .then(({ rows }) => {
             console.log("rows: ", rows);
             req.session.signed = rows[0].id;
 
             res.redirect("/thanks");
         })
-        .catch((err) => console.log("petition error", err));
+        .catch((err) => {
+            console.log("petition error", err);
+            res.render("petition", {
+                err: true,
+            });
+        });
 });
+//REGISTER ROUTE
+
+app.get("/register", (req, res) => {
+    res.render("register", {});
+});
+
+app.post("/register", (req, res) => {
+    const { user_first, user_last, email, password } = req.body;
+    console.log("requested body", req.body);
+    // Hash password
+    hash(password)
+        .then((hashedPassword) => {
+            db.addUserInput(user_first, user_last, email, hashedPassword)
+                .then(({ rows }) => {
+                    console.log("rows: ", rows);
+                    req.session.userid = rows[0].id;
+
+                    res.redirect("/thanks");
+                })
+                .catch((err) => console.log("register error", err));
+            res.render("register", {
+                err: true,
+            });
+        })
+        .catch((err) => console.log("error in hash", err));
+});
+
+///////////////
 
 app.get("/signers", (req, res) => {
     db.getSigners()
@@ -70,7 +101,7 @@ app.get("/thanks", (req, res) => {
             .then(({ rows }) => {
                 console.log("rows: ", rows);
                 var signatureImage = rows[0];
-                console.log("signatureImage", signatureImage);
+                //console.log("signatureImage", signatureImage);
                 /*res.render("thanks", {
                     rows,
                 });*/
@@ -89,22 +120,6 @@ app.get("/thanks", (req, res) => {
         res.redirect("/petition");
     }
 });
-app.get("/register", (req, res) => {
-    res.render("register", {});
-});
-
-app.post("/register", (req, res) => {
-    const { user_first, user_last, user_email, hash } = req.body;
-    console.log("requested body", req.body);
-    db.addSignature(user_first, user_last, user_email, hash)
-        .then(({ rows }) => {
-            console.log("rows: ", rows);
-            req.session.signed = rows[0].id;
-
-            res.redirect("/thanks");
-        })
-        .catch((err) => console.log("petition error", err));
-});
 
 app.get("/login", (req, res) => {
     res.render("login", {});
@@ -114,16 +129,3 @@ app.get("/profile", (req, res) => {
     res.render("profile", {});
 });
 app.listen(8080, () => console.log("Petition up and running...."));
-
-/*db.addCity("York", "UK", 500000)
-    .then(({ rows }) => {
-        console.log("rows", rows);
-    })
-    .catch((err) => console.log(err));*/
-
-/*db.getAllCities()
-    //.then((result) => { -- the next line is destructuring out just rows from results
-.then (({rows})) => {
-        console.log("result", result);
-    })
-    .catch((err) => console.log(err));*/

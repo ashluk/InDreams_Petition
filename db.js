@@ -1,8 +1,4 @@
 const spicedPg = require("spiced-pg");
-
-//for the demo we will talk to the cities database
-//we will want a new database for the petition
-//we do this by --- createdb nameofdatabase
 const db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
 
 //we are going to want to export our functions
@@ -10,21 +6,24 @@ module.exports.getSignatures = () => {
     const q = `SELECT * FROM signatures`;
     return db.query(q);
 };
+
 //USERS TABLE
 //this will eventually change to USERS add the registration info(first, last, email, password)
-module.exports.addSignature = (first, last, signature) => {
-    const q = `INSERT INTO signatures (first, last, signature)
-            values($1, $2, $3)
+module.exports.addUserInput = (user_first, user_last, email, password_hash) => {
+    const q = `INSERT INTO users (user_first, user_last, email, password_hash)
+            values($1, $2, $3, $4)
             RETURNING id
             
     `;
-    const params = [first, last, signature];
+    const params = [user_first, user_last, email, password_hash];
 
     return db.query(q, params);
 };
+
 //this will also move to the USERS
 module.exports.getSigners = () => {
-    const q = `SELECT first, last  FROM signatures`;
+    const q = `SELECT user_first, user_last  FROM users`;
+    //changed the above line to users from signatures
     return db.query(q);
 };
 
@@ -33,6 +32,16 @@ module.exports.getSigners = () => {
 module.exports.getCount = () => {
     const q = `SELECT COUNT(*) FROM signatures`;
     return db.query(q);
+};
+//this captures the signature and userId
+module.exports.addSignature = (signature, user_id) => {
+    const q = `INSERT INTO signatures (signature, user_id)
+            values($1, $2)
+            RETURNING id
+            
+    `;
+    const params = [signature, user_id];
+    return db.query(q, params);
 };
 //this gives us the dataURL which in turn we use to make the signature image
 module.exports.signatureId = (sigId) => {
