@@ -40,7 +40,8 @@ app.get("/petition", (req, res) => {
 app.post("/petition", (req, res) => {
     const { signature } = req.body;
     console.log("requested body", req.body);
-    db.addSignature(signature, req.session.userId)
+    console.log("req session", req.session);
+    db.addSignature(signature, req.session.userid)
         .then(({ rows }) => {
             console.log("rows: ", rows);
             req.session.signed = rows[0].id;
@@ -61,24 +62,32 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-    const { user_first, user_last, email, password } = req.body;
+    console.log("req", req.body);
+    const { user_first, user_last, email, password_hash } = req.body;
     console.log("requested body", req.body);
     // Hash password
-    hash(password)
+    hash(password_hash)
         .then((hashedPassword) => {
             db.addUserInput(user_first, user_last, email, hashedPassword)
                 .then(({ rows }) => {
                     console.log("rows: ", rows);
                     req.session.userid = rows[0].id;
 
-                    res.redirect("/thanks");
+                    res.redirect("/petition");
                 })
-                .catch((err) => console.log("register error", err));
+                .catch((err) => {
+                    console.log("register error", err);
+                    res.render("register", {
+                        err: true,
+                    });
+                });
+        })
+        .catch((err) => {
+            console.log("error in hash", err);
             res.render("register", {
                 err: true,
             });
-        })
-        .catch((err) => console.log("error in hash", err));
+        });
 });
 
 ///////////////
@@ -124,8 +133,21 @@ app.get("/thanks", (req, res) => {
 app.get("/login", (req, res) => {
     res.render("login", {});
 });
+/*app.post('/login', (req,res) => {
+    // Verifying Passwords:
+    compare(
+        password, // Plain text from User
+        passwordHash // Hash from Database
+    ).then((match) => {
+        // Do what you need to do.
+        // match will be true or false ;)
+    });
+});*/
 
 app.get("/profile", (req, res) => {
     res.render("profile", {});
 });
-app.listen(8080, () => console.log("Petition up and running...."));
+
+app.listen(process.env.PORT || 8080, () =>
+    console.log("Petition up and running....")
+);
