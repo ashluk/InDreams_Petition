@@ -143,7 +143,9 @@ app.get("/login", (req, res) => {
         // match will be true or false ;)
     });
 });*/
-
+app.get("/", (req, res) => {
+    res.redirect("/register");
+});
 app.get("/profile", (req, res) => {
     res.render("profile", {});
 });
