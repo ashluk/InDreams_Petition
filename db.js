@@ -32,6 +32,7 @@ module.exports.getSigners = () => {
 };
 
 //SIGNATURE TABLE
+
 //this is selecting which number you are on the signatures table
 module.exports.getCount = () => {
     const q = `SELECT COUNT(*) FROM signatures`;
@@ -54,5 +55,32 @@ module.exports.signatureId = (sigId) => {
     //const q = `SELECT * FROM signatures WHERE id = $1`;
     return db.query(q, [sigId]);
 };
+//this will select the email and password to compare
+module.exports.passwordCompare = (email) => {
+    const q = `SELECT password_hash, id FROM users WHERE id = $1 `;
+    const params = [email];
+    return db.query(q, params);
+};
+//USER_PROFILES
 
-//  the $1,$2...are replacing this --- values (${city}, ${country}, ${population})
+//this will INSERT new user info from the profile page into the user_profiles
+module.exports.addUser = (id, age, city, url) => {
+    const q = `INSERT INTO user_profiles (age,city,url,user_id) 
+                values($1,$2,$3,$4)
+                RETURNING user_id`;
+    const params = [age, city, url, user_id];
+    return db.query(q, params);
+};
+
+//these tables will need to be JOINED with the users info tables.
+module.exports.getUsers = () => {
+    const q = `SELECT age, city, url, user FROM user_profiles`;
+    return db.query(q);
+};
+
+module.exports.signersByCity = (city) => {
+    const q = `SELECT age, city, url, user FROM user_profiles
+                WHERE LOWER(city) = LOWER($1)`;
+    const params = [city];
+    return db.query(q, params);
+};

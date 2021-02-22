@@ -62,10 +62,8 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-    console.log("req", req.body);
     const { user_first, user_last, email, password_hash } = req.body;
-    console.log("requested body", req.body);
-    // Hash password
+    // console.log("requested body", req.body);
     hash(password_hash)
         .then((hashedPassword) => {
             db.addUserInput(user_first, user_last, email, hashedPassword)
@@ -85,6 +83,54 @@ app.post("/register", (req, res) => {
         .catch((err) => {
             console.log("error in hash", err);
             res.render("register", {
+                err: true,
+            });
+        });
+});
+////LOGIN ROUTE
+
+app.get("/login", (req, res) => {
+    res.render("login", {});
+});
+app.post("/login", (req, res) => {
+    const { email, password } = req.body;
+    console.log("email, password", req.body);
+    if (!req.session.userid) {
+        console.log("!req.session.userid", req.session.userid);
+        res.render("login", {
+            err: true,
+        });
+    } else if (email == "") {
+        console.log("!email");
+
+        res.render("login", {
+            err: "error in email",
+        });
+    } else if (password == "") {
+        console.log("!password");
+        res.render("login", {
+            err: "error in password",
+        });
+    }
+    db.passwordCompare(email)
+        .then(({ rows }) => {
+            console.log("rows id", rows);
+            compare(password, rows[0].password_hash).then((match) => {
+                if (match) {
+                    req.session.userid = rows[0].id;
+                    res.redirect("/petition");
+                    console.log("matched id");
+                } else {
+                    res.render("login", {
+                        err: true,
+                    });
+                }
+                // match will be true or false ;)
+            });
+        })
+        .catch((err) => {
+            console.log("error in login", err);
+            res.render("login", {
                 err: true,
             });
         });
@@ -130,19 +176,6 @@ app.get("/thanks", (req, res) => {
     }
 });
 
-app.get("/login", (req, res) => {
-    res.render("login", {});
-});
-/*app.post('/login', (req,res) => {
-    // Verifying Passwords:
-    compare(
-        password, // Plain text from User
-        passwordHash // Hash from Database
-    ).then((match) => {
-        // Do what you need to do.
-        // match will be true or false ;)
-    });
-});*/
 app.get("/", (req, res) => {
     res.redirect("/register");
 });
