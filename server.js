@@ -4,12 +4,12 @@ const db = require("./db");
 const hb = require("express-handlebars");
 const { hash, compare } = require("./utils/bc.js");
 const cookieSession = require("cookie-session");
-const {
+/*const {
     LoggedInUser,
     requireNoSignature,
     requireSignature,
 } = require("./middlewear");
-
+exports.app = app;*/
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
@@ -99,7 +99,8 @@ app.get("/login", (req, res) => {
 });
 app.post("/login", (req, res) => {
     //const { email, password } = req.body;
-    const password = req.body.password;
+
+    const password = req.body.password_hash;
     const email = req.body.email;
     console.log("email, password", req.body);
     if (!req.session.userid) {
@@ -122,6 +123,8 @@ app.post("/login", (req, res) => {
     db.passwordCompare(email)
         .then(({ rows }) => {
             console.log("rows id", rows);
+            console.log("password, rows", password, rows[0].password_hash);
+
             compare(password, rows[0].password_hash)
                 .then((match) => {
                     if (match === true) {
@@ -150,13 +153,27 @@ app.post("/login", (req, res) => {
 });
 
 ///PROFILE PAGE
-//check that the url the user provided is good for it, i.e. does indeed start with either https:// or http://, if not, add that to whatever they provided!
 app.get("/profile", (req, res) => {
     res.render("profile", {});
 });
+
+//check that the url the user provided starts with either https:// or http://, if not, add that to whatever they provided!
+
 app.post("/profile", (req, res) => {
-    const { age, city, url } = req.body;
-    console.log("age,city,url", req.body);
+    const { age, city, url, user_id } = req.body;
+    console.log("age,city,url, user_id", req.body);
+    db.addUser(age, city, url, req.session.userid)
+        .then(({ rows }) => {
+            console.log("adduser", rows);
+            req.session.userid = rows[0].id;
+            res.redirect("/signers");
+        })
+        .catch((err) => {
+            console.log("error in profile", err);
+            res.render("profile", {
+                err: true,
+            });
+        });
 });
 
 ///////////////
@@ -202,7 +219,9 @@ app.get("/thanks", (req, res) => {
 app.get("/", (req, res) => {
     res.redirect("/register");
 });
-
-app.listen(process.env.PORT || 8080, () =>
-    console.log("Petition up and running....")
-);
+//this if statement makes sure that our server does not fully run when we run our tests
+if (require.main == module) {
+    app.listen(process.env.PORT || 8080, () =>
+        console.log("Petition up and running....")
+    );
+}

@@ -50,15 +50,6 @@ module.exports.addSignature = (signature, user_id) => {
 };
 //this gives us the dataURL which in turn we use to make the signature image
 module.exports.signatureId = (sigId) => {
-    /*const q = `SELECT signatures.signature, users.user_first, users.user_last, user_profiles.age, user_profiles.city, user_profiles.city \
-    FROM signatures 
-    LEFT JOIN users ON users.user_first = signatures.user_first
-    LEFT JOIN users ON users.user_last = signatures.user_last
-    LEFT JOIN user_profiles ON user_profiles.age = signatures.age
-    LEFT JOIN user_profiles ON user_profiles.city = signatures.city
-    LEFT JOIN user_profiles ON user_profiles.url = signatures.url
-    WHERE id = $1`;*/
-
     const q = `SELECT * FROM signatures WHERE id = $1`;
     return db.query(q, [sigId]);
 };
@@ -72,7 +63,7 @@ module.exports.passwordCompare = (email) => {
 //USER_PROFILES
 
 //this will INSERT new user info from the profile page into the user_profiles
-module.exports.addUser = (id, age, city, url) => {
+module.exports.addUser = (age, city, url, user_id) => {
     const q = `INSERT INTO user_profiles (age,city,url,user_id) 
                 values($1,$2,$3,$4)
                 RETURNING user_id`;
