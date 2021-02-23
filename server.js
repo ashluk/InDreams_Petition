@@ -88,52 +88,63 @@ app.post("/register", (req, res) => {
         });
 });
 ////LOGIN ROUTE
-
+//need help with the post route on here -- not sure about my if statements and there is an error 'invalid input syntax for type integer' on the email
 app.get("/login", (req, res) => {
     res.render("login", {});
 });
 app.post("/login", (req, res) => {
-    const { email, password } = req.body;
+    //const { email, password } = req.body;
+    const password = req.body.password;
+    const email = req.body.email;
     console.log("email, password", req.body);
     if (!req.session.userid) {
         console.log("!req.session.userid", req.session.userid);
         res.render("login", {
-            err: true,
+            err: "ERROR! -- you have no user id",
         });
     } else if (email == "") {
         console.log("!email");
 
         res.render("login", {
-            err: "error in email",
+            err: "ERROR! -- provide email",
         });
     } else if (password == "") {
         console.log("!password");
         res.render("login", {
-            err: "error in password",
+            err: "ERROR! -- provide password",
         });
     }
     db.passwordCompare(email)
         .then(({ rows }) => {
             console.log("rows id", rows);
             compare(password, rows[0].password_hash).then((match) => {
-                if (match) {
+                if (match === true) {
                     req.session.userid = rows[0].id;
                     res.redirect("/petition");
                     console.log("matched id");
                 } else {
                     res.render("login", {
-                        err: true,
+                        err: "password incorrect",
                     });
                 }
-                // match will be true or false ;)
             });
         })
         .catch((err) => {
             console.log("error in login", err);
             res.render("login", {
-                err: true,
+                err: "error in passwordCompare catch",
             });
         });
+});
+
+///PROFILE PAGE
+//check that the url the user provided is good for it, i.e. does indeed start with either https:// or http://, if not, add that to whatever they provided!
+app.get("/profile", (req, res) => {
+    res.render("profile", {});
+});
+app.post("/profile", (req, res) => {
+    const { age, city, url } = req.body;
+    console.log("age,city,url", req.body);
 });
 
 ///////////////
@@ -178,9 +189,6 @@ app.get("/thanks", (req, res) => {
 
 app.get("/", (req, res) => {
     res.redirect("/register");
-});
-app.get("/profile", (req, res) => {
-    res.render("profile", {});
 });
 
 app.listen(process.env.PORT || 8080, () =>
