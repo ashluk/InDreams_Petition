@@ -26,8 +26,11 @@ module.exports.addUserInput = (user_first, user_last, email, password_hash) => {
 
 //this will also move to the USERS
 module.exports.getSigners = () => {
-    const q = `SELECT user_first, user_last  FROM users`;
-    //changed the above line to users from signatures
+    // const q = `SELECT user_first, user_last  FROM users`;
+    const q = `SELECT users.user_first, users.user_last, user_profiles.age, user_profiles.city, user_profiles.url
+   FROM users
+   LEFT JOIN user_profiles ON  users.id = user_profiles.user_id`;
+    // we are joining on users.id x user_profiles.user_id because user ID is what holds them together
     return db.query(q);
 };
 
@@ -74,22 +77,24 @@ module.exports.addUser = (age, city, url, user_id) => {
 //these tables will need to be JOINED with the users info tables.
 module.exports.getUsers = () => {
     const q = `SELECT user_profile.age, user_profile.city, user_profile.url, users.user_first, users.user_last, users.email
-     FROM user_profiles
-     INNER JOIN users ON users.user_first = user_profiles.user_first
-     INNER JOIN users ON users.user_last = user_profiles.user_last
-     INNER JOIN users ON users.email = user_profiles.email`;
+     FROM users
+     INNER JOIN signatures ON users.id = signatures.user_id
+     LEFT JOIN user_profiles ON users.id = user_profiles.user_id`;
     return db.query(q);
 };
+//we are joining signtures.user_id because it holds the reference point to the id in user_id
+//first, last required - joinin users and signatures only those that have signed
+//selecting from users, joining signatures where users id is equal to user_id
+//secomd join left join
 
 module.exports.signersByCity = (city) => {
     /*const q = `SELECT age, city, url, user FROM user_profiles
                 WHERE LOWER(city) = LOWER($1)`;*/
 
     const q = `SELECT user_profile.age, user_profile.city, user_profile.url, users.user_first, users.user_last, users.email
-     FROM user_profiles
-     INNER JOIN users ON users.user_first = user_profiles.user_first
-     INNER JOIN users ON users.user_last = user_profiles.user_last
-     INNER JOIN users ON users.email = user_profiles.email
+    FROM users
+     INNER JOIN signatures ON users.id = signatures.user_id
+     LEFT JOIN user_profiles ON users.id = user_profiles.user_id
      WHERE LOWER(city) = LOWER($1)`;
     const params = [city];
     return db.query(q, params);

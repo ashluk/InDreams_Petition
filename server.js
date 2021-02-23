@@ -189,6 +189,17 @@ app.get("/signers", (req, res) => {
         })
         .catch((err) => console.log("error in signers page", err));
 });
+app.get("/signers/:city", (req, res) => {
+    console.log("signers/city", req.params);
+    db.signersByCity(req.params)
+        .then(({ rows }) => {
+            var fullNames = rows;
+            res.render("signersbycity", {
+                fullNames,
+            });
+        })
+        .catch((err) => console.log("erron in signersbyCity", err));
+});
 
 app.get("/thanks", (req, res) => {
     if (req.session.signed) {
@@ -219,6 +230,7 @@ app.get("/thanks", (req, res) => {
 app.get("/", (req, res) => {
     res.redirect("/register");
 });
+
 //this if statement makes sure that our server does not fully run when we run our tests
 if (require.main == module) {
     app.listen(process.env.PORT || 8080, () =>
