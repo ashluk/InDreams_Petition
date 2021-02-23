@@ -26,8 +26,7 @@ module.exports.addUserInput = (user_first, user_last, email, password_hash) => {
 
 //this will also move to the USERS
 module.exports.getSigners = () => {
-    const q = `SELECT `;
-    //const q = `SELECT user_first, user_last  FROM users`;
+    const q = `SELECT user_first, user_last  FROM users`;
     //changed the above line to users from signatures
     return db.query(q);
 };
@@ -66,7 +65,7 @@ module.exports.signatureId = (sigId) => {
 //this will select the email and password to compare
 //alter select in login to find user info by email in log
 module.exports.passwordCompare = (email) => {
-    const q = `SELECT password_hash, id FROM users WHERE id = $1 `;
+    const q = `SELECT password_hash, id FROM users WHERE email = $1 `;
     const params = [email];
     return db.query(q, params);
 };

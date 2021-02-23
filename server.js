@@ -4,6 +4,11 @@ const db = require("./db");
 const hb = require("express-handlebars");
 const { hash, compare } = require("./utils/bc.js");
 const cookieSession = require("cookie-session");
+const {
+    LoggedInUser,
+    requireNoSignature,
+    requireSignature,
+} = require("./middlewear");
 
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
@@ -117,17 +122,24 @@ app.post("/login", (req, res) => {
     db.passwordCompare(email)
         .then(({ rows }) => {
             console.log("rows id", rows);
-            compare(password, rows[0].password_hash).then((match) => {
-                if (match === true) {
-                    req.session.userid = rows[0].id;
-                    res.redirect("/petition");
-                    console.log("matched id");
-                } else {
+            compare(password, rows[0].password_hash)
+                .then((match) => {
+                    if (match === true) {
+                        req.session.userid = rows[0].id;
+                        res.redirect("/petition");
+                        console.log("matched id");
+                    } else {
+                        res.render("login", {
+                            err: "password incorrect",
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log("error in compare", err);
                     res.render("login", {
-                        err: "password incorrect",
+                        err: "passwords do not match",
                     });
-                }
-            });
+                });
         })
         .catch((err) => {
             console.log("error in login", err);
