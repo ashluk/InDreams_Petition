@@ -29,7 +29,14 @@ app.use(
         extended: false,
     })
 );
+//CSRF
+const csurf = require("csurf");
 
+app.use(csurf());
+app.use(function (req, res, next) {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 //PETITION ROUTE
 app.get("/petition", (req, res) => {
     if (req.session.signed) {
@@ -93,7 +100,6 @@ app.post("/register", (req, res) => {
         });
 });
 ////LOGIN ROUTE
-//need help with the post route on here -- not sure about my if statements and there is an error 'invalid input syntax for type integer' on the email
 app.get("/login", (req, res) => {
     res.render("login", {});
 });
@@ -175,6 +181,69 @@ app.post("/profile", (req, res) => {
             });
         });
 });
+//EDIT ROUTE
+app.get("/edit", (req, res) => {
+    /*if (!req.session.userid) {
+        db.getUsers().then(({ rows }) => {
+            var editinfo = rows;
+            res.render("edit", {
+                editinfo,
+            }).catch((err) => {
+                console.log("error in editnopass", err);
+            });
+        });
+    }*/
+    if (req.session.userid) {
+        console.log("reqsess", req.session.userid);
+
+        db.getUserProfile(req.session.userid)
+
+            .then(({ rows }) => {
+                console.log("theserows", rows), rows;
+                res.render("edit", {
+                    rows,
+                });
+            })
+            .catch((err) => console.log("error in editpass", err));
+    } else {
+        res.redirect("/register");
+    }
+    // res.render("edit", {});
+});
+
+app.post("/edit", (req, res) => {
+    const {
+        user_first,
+        user_last,
+        email,
+        password_hash,
+        age,
+        city,
+        url,
+    } = req.body;
+    console.log("edit info", req.body);
+    res.render("edit");
+});
+/*app.post("/edit", (req, res) => {
+    const {user_first, user_last, email, password_hash, age, city, url} = req.body
+    if (password_hash) {
+        hash(password_hash)
+        .then((hashedPassword) => {
+            db.addUserInput(user_first, user_last, email, hashedPassword)
+                .then(({ rows }) => {
+                    console.log("rows: ", rows);
+                    req.session.userid = rows[0].id;
+                }).catch((err) => {
+                    res.render('edit')
+                })
+        // hash the new password
+        // update 4 columns in users table
+        // run upsert for user_profiles
+    } else {
+        // update 3 columns in users table
+        // run upsert for user_profiles
+    }
+});*/
 
 ///////////////
 
@@ -194,7 +263,7 @@ app.get("/signers/:city", (req, res) => {
     db.signersByCity(req.params)
         .then(({ rows }) => {
             var fullNames = rows;
-            res.render("signersbycity", {
+            res.render("city", {
                 fullNames,
             });
         })

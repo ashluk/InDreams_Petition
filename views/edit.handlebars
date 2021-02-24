@@ -1,37 +1,44 @@
 <form method="POST">
 <body>
-    <form action="/register" method="post">
+    <form action="/edit" method="post">
 
-    <div class="seal" id="seal"><a href = '/'><img src="https://indreams.club/images/mv-seal.png"></div></a>
-  <h3><strong>do you believe in the power of dreams? </strong>the heirarchy of physical reality over psychic reality is a construct of society, sign our petition and let your voice be heard. indreams.inc  </h3>
-  
-    <div>
+     <h1>EDIT YOUR PROFILE</h1>
+ <div>
 
     <label for="first">First:</label>
     <input type="text" id="first" name="user_first">
-    </div>
- 
-    <div>
+ </div>
+ <div>
 
     <label for="last">Last:</label>
     <input type="text" id="last" name="user_last">
-  
-    </div>
-<div>
+ </div>
+  <div>
 
     <label for="email">Email:</label>
     <input type="text" id="email" name="email">
-</div>
-
-<div>
+  </div>
+  <div>
 
     <label for="password">Password:</label>
     <input type="password" id="password" name="password_hash">
-</div>
-
-  <div>
-    <p>already registered? head over here to <a href="/login">login</a> </p>
   </div>
+  <div>
+
+    <label for="age">age::</label>
+    <input type="text" id="age" name="age">
+  </div>
+  <div>
+
+    <label for="city">city:</label>
+    <input type="text" id="city" name="city">
+  </div>
+  <div>
+
+    <label for="url">url:</label>
+    <input type="href" id="url" name="url">
+  </div>
+  
       
  
 
@@ -39,9 +46,9 @@
         <!---  <button type="button" class="button clear" data-action="clear">clear</button>
                   <button type="sumbit" class="submit" data-action="submit">submit</button> -->
 
-
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
  
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
 </form>
 </body>
 </form>

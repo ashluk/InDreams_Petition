@@ -1,21 +1,26 @@
 <form method="POST">
 <body>
     <form action="/login" method="post">
- <ul>
+ <div>
+
     <label for="email">Email:</label>
     <input type="text" id="email" name="email">
-  </li>
-  <li>
+ </div>
+  <div>
+
     <label for="password">Password:</label>
     <input type="password" id="password" name="password_hash">
-  </li>
-  <li>
+  </div>
+  <div>
+
     <input type="submit" value="submit">
         <!---  <button type="button" class="button clear" data-action="clear">clear</button>
                   <button type="sumbit" class="submit" data-action="submit">submit</button> -->
+  </div>
 
-  </li>
- </ul>
+  
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
  {{#if err}}
     <div class="err">{{err}}</div>
 {{/if}}

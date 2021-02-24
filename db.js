@@ -5,14 +5,12 @@ const db = spicedPg(
         "postgres:postgres:postgres@localhost:5432/petition"
 );
 
-//we are going to want to export our functions
 module.exports.getSignatures = () => {
     const q = `SELECT * FROM signatures`;
     return db.query(q);
 };
 
 //USERS TABLE
-//this will eventually change to USERS add the registration info(first, last, email, password)
 module.exports.addUserInput = (user_first, user_last, email, password_hash) => {
     const q = `INSERT INTO users (user_first, user_last, email, password_hash)
             values($1, $2, $3, $4)
@@ -24,9 +22,7 @@ module.exports.addUserInput = (user_first, user_last, email, password_hash) => {
     return db.query(q, params);
 };
 
-//this will also move to the USERS
 module.exports.getSigners = () => {
-    // const q = `SELECT user_first, user_last  FROM users`;
     const q = `SELECT users.user_first, users.user_last, user_profiles.age, user_profiles.city, user_profiles.url
    FROM users
    LEFT JOIN user_profiles ON  users.id = user_profiles.user_id`;
@@ -74,9 +70,8 @@ module.exports.addUser = (age, city, url, user_id) => {
     return db.query(q, params);
 };
 
-//these tables will need to be JOINED with the users info tables.
 module.exports.getUsers = () => {
-    const q = `SELECT user_profile.age, user_profile.city, user_profile.url, users.user_first, users.user_last, users.email
+    const q = `SELECT user_profiles.age, user_profiles.city, user_profiles.url, users.user_first, users.user_last, users.email
      FROM users
      INNER JOIN signatures ON users.id = signatures.user_id
      LEFT JOIN user_profiles ON users.id = user_profiles.user_id`;
@@ -88,14 +83,40 @@ module.exports.getUsers = () => {
 //secomd join left join
 
 module.exports.signersByCity = (city) => {
-    /*const q = `SELECT age, city, url, user FROM user_profiles
-                WHERE LOWER(city) = LOWER($1)`;*/
-
-    const q = `SELECT user_profile.age, user_profile.city, user_profile.url, users.user_first, users.user_last, users.email
+    const q = `SELECT user_profiles.age, user_profiles.city, user_profiles.url, users.user_first, users.user_last, users.email
     FROM users
-     INNER JOIN signatures ON users.id = signatures.user_id
-     LEFT JOIN user_profiles ON users.id = user_profiles.user_id
-     WHERE LOWER(city) = LOWER($1)`;
+    INNER JOIN signatures ON users.id = signatures.user_id
+    LEFT JOIN user_profiles ON users.id = user_profiles.user_id
+    WHERE LOWER(city) = LOWER($1)`;
     const params = [city];
+    return db.query(q, params);
+};
+
+//EDITS
+
+//GET from user profiles to pre populate /EDIT
+module.exports.getUserProfile = () => {
+    const q = `SELECT users.user_first, users.user_last, user_profiles.age, user_profiles.city, user_profiles.url
+   FROM users
+   LEFT JOIN user_profiles ON  users.id = user_profiles.user_id`;
+    //WHERE (id) = $1
+    //const params = [id];
+    return db.query(q);
+};
+
+module.exports.editUserPass = (id) => {
+    const q = `SELECT user_profiles.age, user_profiles.city, user_profiles.url, users.user_first, users.user_last, users.email
+    FROM users
+    LEFT JOIN user_profiles ON users.id = user_profiles.user_id
+    WHERE (id) = $1`;
+    const params = [id];
+    return db.query(q, params);
+};
+module.exports.editUserNoPass = (id) => {
+    const q = `SELECT user_profiles.age, user_profiles.city, user_profiles.url, users.user_first, users.user_last, users.email
+    FROM users
+    LEFT JOIN user_profiles ON users.id = user_profiles.user_id
+    WHERE (id) = $1`;
+    const params = [id];
     return db.query(q, params);
 };
