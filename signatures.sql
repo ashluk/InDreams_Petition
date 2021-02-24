@@ -26,10 +26,6 @@ CREATE TABLE signatures (
     signature  TEXT    NOT NULL CHECK (signature <> ''),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
- -- Add the foreign key user_id
-    -- Foreign keys let us link tables together, in this case it let's us
-    -- identify which signature belongs to which user from the users table.
-    -- This link can be leverage in JOIN queries (covered in Part 4).
 
 CREATE TABLE user_profiles (
 id SERIAL PRIMARY KEY,
@@ -37,3 +33,7 @@ age INT,
 city VARCHAR(100),
 url VARCHAR(300),
 user_id INT REFERENCES users(id) NOT NULL UNIQUE);
+ -- Add the foreign key user_id
+    -- Foreign keys let us link tables together, in this case it let's us
+    -- identify which signature belongs to which user from the users table.
+    -- This link can be leverage in JOIN queries (covered in Part 4).

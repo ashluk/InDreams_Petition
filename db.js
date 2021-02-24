@@ -95,28 +95,62 @@ module.exports.signersByCity = (city) => {
 //EDITS
 
 //GET from user profiles to pre populate /EDIT
-module.exports.getUserProfile = () => {
-    const q = `SELECT users.user_first, users.user_last, user_profiles.age, user_profiles.city, user_profiles.url
+module.exports.getUserProfile = (userid) => {
+    const q = `SELECT users.user_first, users.user_last, user_profiles.age, user_profiles.city, user_profiles.url, users.id, users.password_hash, users.email
    FROM users
-   LEFT JOIN user_profiles ON  users.id = user_profiles.user_id`;
-    //WHERE (id) = $1
-    //const params = [id];
-    return db.query(q);
-};
-
-module.exports.editUserPass = (id) => {
-    const q = `SELECT user_profiles.age, user_profiles.city, user_profiles.url, users.user_first, users.user_last, users.email
-    FROM users
-    LEFT JOIN user_profiles ON users.id = user_profiles.user_id
-    WHERE (id) = $1`;
-    const params = [id];
+   LEFT JOIN user_profiles ON  users.id = user_profiles.user_id
+    WHERE user_id = $1`;
+    const params = [userid];
     return db.query(q, params);
 };
-module.exports.editUserNoPass = (id) => {
-    const q = `SELECT user_profiles.age, user_profiles.city, user_profiles.url, users.user_first, users.user_last, users.email
-    FROM users
-    LEFT JOIN user_profiles ON users.id = user_profiles.user_id
-    WHERE (id) = $1`;
-    const params = [id];
+
+//UPDATE query -- password == four columns
+//no pass === three
+
+//does require.body.pass exist if soo call the one with password
+module.exports.editUserPass = (
+    userfirst,
+    userlast,
+    useremail,
+    userpass,
+    userid
+) => {
+    const q = `
+    UPDATE users 
+    SET 
+    user_first = $1
+    user_last = $2
+    email = $3
+    password_hash = $4
+    WHERE user_id = $5`;
+    const params = [userfirst, userlast, useremail, userpass, userid];
+    return db.query(q, params);
+};
+module.exports.editUserNoPass = (userfirst, userlast, useremail, userid) => {
+    const q = `
+    UPDATE users 
+    SET 
+    user_first = $1
+    user_last = $2
+    email = $3
+    WHERE user_id = $4`;
+    const params = [userfirst, userlast, useremail, userid];
+    return db.query(q, params);
+};
+
+module.exports.userUpsert = (userage, usercity, userurl, userid) => {
+    const q = `
+    INSERT INTO user_profiles (age, city, url, user_id)
+    VALUES = age, city, url
+    ON CONFLICT (user_id)
+    DO UPDATE SET age = $1, city = $2, url = $3  `;
+    const params = [userage, usercity, userurl, userid];
+    return db.query(q, params);
+};
+
+module.exports.sigDelete = (userid) => {
+    const q = `
+    DELETE FROM signature WHERE id = $1`;
+    const params = [userid];
     return db.query(q, params);
 };

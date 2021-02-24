@@ -17,7 +17,10 @@
 
  <a href="/signers"><button>SIGNERS</button></a>   
  <div></div>
- <form action="delete" method="POST">
+ <form method="POST">
+ <form action="/delete" method="POST">
+  <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
 <button>DELETE SIGNATURE</button>
+ </form>
  </form>

@@ -88,7 +88,7 @@ app.post("/register", (req, res) => {
                     console.log("rows: ", rows);
                     req.session.userid = rows[0].id;
 
-                    res.redirect("/petition");
+                    res.redirect("/login");
                 })
                 .catch((err) => {
                     console.log("register error", err);
@@ -139,6 +139,7 @@ app.post("/login", (req, res) => {
             compare(password, rows[0].password_hash)
                 .then((match) => {
                     if (match === true) {
+                        //console.log("WHAT IS IN THE ROW.ID", rows[0].id); RETURNS MY USER_ID
                         req.session.userid = rows[0].id;
                         res.redirect("/petition");
                         console.log("matched id");
@@ -195,9 +196,10 @@ app.get("/edit", (req, res) => {
         db.getUserProfile(req.session.userid)
 
             .then(({ rows }) => {
-                console.log("theserows", rows), rows[0].userid;
+                console.log("theserows", rows);
+                var currentUser = rows[0];
                 res.render("edit", {
-                    rows,
+                    currentUser,
                 });
             })
             .catch((err) => console.log("error in editpass", err));
@@ -205,6 +207,8 @@ app.get("/edit", (req, res) => {
         res.redirect("/register");
     }
 });
+
+////WORKING ON POST EDIT ROUTE
 
 app.post("/edit", (req, res) => {
     const {
@@ -215,9 +219,64 @@ app.post("/edit", (req, res) => {
         age,
         city,
         url,
+        id,
     } = req.body;
-    console.log("edit info", req.body);
-    res.render("edit");
+    console.log("edit info", req.body.password_hash);
+    if (req.body.password_hash) {
+        hash(password_hash)
+            .then((hashedPassword) => {
+                db.editUserPass(
+                    req.body.user_first,
+                    req.body.user_last,
+                    req.body.email,
+                    req.body.password_hash,
+                    req.body.id
+                )
+                    .then(() => {
+                        db.userUpsert(
+                            req.body.age,
+                            req.body.city,
+                            req.body.url,
+                            req.body.id
+                        ).then(() => {
+                            res.render("edit");
+                            res.redirect("/profile");
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("err in userPass", err);
+                    });
+            })
+            .catch((err) => {
+                console.log("err in hashedPass", err);
+            });
+    } else {
+        db.editUserNoPass(
+            req.body.user_first,
+            req.body.user_last,
+            req.body.email,
+            req.body.id
+        )
+            .then(() => {
+                db.userUpsert(
+                    req.body.age,
+                    req.body.city,
+                    req.body.url,
+                    req.body.id
+                )
+                    .then(() => {
+                        res.render("edit");
+                        res.redirect("/profile");
+                    })
+                    .catch((err) => {
+                        console.log("err in userUpsert", err);
+                    });
+            })
+            .catch((err) => {
+                console.log("err in userNoPass", err);
+            });
+    }
+    //res.render("edit");
 });
 /*app.post("/edit", (req, res) => {
     const {user_first, user_last, email, password_hash, age, city, url} = req.body
@@ -254,8 +313,8 @@ app.get("/signers", (req, res) => {
         .catch((err) => console.log("error in signers page", err));
 });
 app.get("/signers/:city", (req, res) => {
-    console.log("signers/city", req.params);
-    db.signersByCity(req.params)
+    console.log("signers/city", req.params.city);
+    db.signersByCity(req.params.city)
         .then(({ rows }) => {
             var fullNames = rows;
             res.render("city", {
@@ -287,8 +346,16 @@ app.get("/thanks", (req, res) => {
 
             .catch((err) => console.log("error in thanks page", err));
     } else {
-        res.redirect("/petition");
+        res.redirect("/register");
     }
+});
+
+app.get("/delete", (req, res) => {
+    console.log("looking for signature id", req.session);
+    db.sigDelete(req.session.userid).then(() => {
+        req.session.signed = undefined;
+        res.redirect("/petition");
+    });
 });
 
 app.get("/", (req, res) => {
