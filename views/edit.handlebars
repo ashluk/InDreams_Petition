@@ -14,6 +14,7 @@
     <input type="text" id="last" name="user_last">
  </div>
   <div>
+{{#rows}}
 
     <label for="email">Email:</label>
     <input type="text" id="email" name="email">
@@ -26,12 +27,12 @@
   <div>
 
     <label for="age">age::</label>
-    <input type="text" id="age" name="age">
+    <input type="text" id="age" name="age" value={{age}}>
   </div>
   <div>
 
     <label for="city">city:</label>
-    <input type="text" id="city" name="city">
+    <input type="text" id="city" name="city" value='{{city}}'>
   </div>
   <div>
 
@@ -39,7 +40,7 @@
     <input type="href" id="url" name="url">
   </div>
   
-      
+      {{/rows}}
  
 
     <input type="submit" value="submit">

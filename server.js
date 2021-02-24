@@ -19,6 +19,11 @@ app.use(
         maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
+app.use((req, res, next) => {
+    console.log("req.url", req.url);
+    console.log("req.session", req.session);
+    next();
+});
 
 console.log("db", db);
 
@@ -171,7 +176,7 @@ app.post("/profile", (req, res) => {
     db.addUser(age, city, url, req.session.userid)
         .then(({ rows }) => {
             console.log("adduser", rows);
-            req.session.userid = rows[0].id;
+            //req.session.userid = rows[0].id;
             res.redirect("/signers");
         })
         .catch((err) => {
@@ -183,23 +188,14 @@ app.post("/profile", (req, res) => {
 });
 //EDIT ROUTE
 app.get("/edit", (req, res) => {
-    /*if (!req.session.userid) {
-        db.getUsers().then(({ rows }) => {
-            var editinfo = rows;
-            res.render("edit", {
-                editinfo,
-            }).catch((err) => {
-                console.log("error in editnopass", err);
-            });
-        });
-    }*/
+    console.log("req.session", req.session);
     if (req.session.userid) {
         console.log("reqsess", req.session.userid);
 
         db.getUserProfile(req.session.userid)
 
             .then(({ rows }) => {
-                console.log("theserows", rows), rows;
+                console.log("theserows", rows), rows[0].userid;
                 res.render("edit", {
                     rows,
                 });
@@ -208,7 +204,6 @@ app.get("/edit", (req, res) => {
     } else {
         res.redirect("/register");
     }
-    // res.render("edit", {});
 });
 
 app.post("/edit", (req, res) => {
