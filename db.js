@@ -155,10 +155,20 @@ module.exports.userUpsert = (userage, usercity, userurl, userid) => {
     const params = [userage, usercity, userurl, userid];
     return db.query(q, params);
 };
-
+///DELETE ROUTES
 module.exports.sigDelete = (userid) => {
     const q = `
     DELETE FROM signatures WHERE user_id = $1`;
+    const params = [userid];
+    return db.query(q, params);
+};
+module.exports.profileDelete = (userid) => {
+    const q = `DELETE FROM user_profiles WHERE user_id = $1`;
+    const params = [userid];
+    return db.query(q, params);
+};
+module.exports.userDelete = (userid) => {
+    const q = `DELETE FROM users WHERE id = $1`;
     const params = [userid];
     return db.query(q, params);
 };

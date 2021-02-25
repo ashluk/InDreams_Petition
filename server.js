@@ -114,12 +114,15 @@ app.post("/login", (req, res) => {
     const password = req.body.password_hash;
     const email = req.body.email;
     console.log("email, password", req.body);
-    if (!req.session.userid) {
+    /*if (!req.session.userid) {
         console.log("!req.session.userid", req.session.userid);
         res.render("login", {
             err: "ERROR! -- you have no user id",
+            
         });
-    } else if (email == "") {
+    } else*/ if (
+        email == ""
+    ) {
         console.log("!email");
 
         res.render("login", {
@@ -176,7 +179,7 @@ app.post("/profile", (req, res) => {
     console.log("age,city,url, user_id", req.body);
     let url = req.body.url;
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
-        url = "https://" + url;
+        url = "http://" + url;
     }
     db.addUser(age, city, url, req.session.userid)
         .then(({ rows }) => {
@@ -228,7 +231,7 @@ app.post("/edit", (req, res) => {
     console.log("edit info", req.body.password_hash);
     console.log("oops these match", password_hash);
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
-        url = "https://" + url;
+        url = "http://" + url;
     }
     console.log("what is my", url);
     if (req.body.password_hash) {
@@ -333,7 +336,8 @@ app.post("/thanks", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-    req.session = undefined;
+    delete req.session;
+    delete req.session.signed;
     //req.session.id = undefined;
     res.redirect("register");
 });
