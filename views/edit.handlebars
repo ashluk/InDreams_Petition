@@ -2,7 +2,7 @@
 <body>
     <form action="/edit" method="post">
 
-     <div class='edityourprofile'><h1>EDIT YOUR PROFILE</h1></div>
+    <div class="edityourprofile"><h1>EDIT YOUR PROFILE</h1></div>
 {{#currentUser}}
 
 <div class="register">
@@ -59,19 +59,4 @@
 
 </body>
 </form>
-<form method="POST"></form>
-<form action="/logout" method="post">
-<button>LOGOUT</button>
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-
-</form>
-</form>
-
-<form method="POST"></form>
-<form action="/delete" method="post">
-<button>DELETE ACCOUNT</button>
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-
-</form>
-</form>
-<div class = 'profile'><p>would you like to <a href="/register">logout</a>?  </p></div>
+<div class = 'profile'><p>incase you want to<a href="/deleteaccount">delete your account</a>...  </p></div>

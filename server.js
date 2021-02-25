@@ -345,10 +345,18 @@ app.post("/logout", (req, res) => {
 app.get("/", (req, res) => {
     res.redirect("/register");
 });
-/*app.post("/deleteaccount", (req, res) => {
-    db.userDelete();
-    db.sigDelete();
-    db.profileDelete();
+/*app.get("/deleteaccount", (req, res) => {
+    db.userDelete(req.session.userid)
+        .then(() => {})
+        .catch((err) => console.log("error in userDelete"));
+    db.sigDelete(req.session.userid)
+        .then(() => {})
+        .catch((err) => console.log("error in sigDelete"));
+    db.profileDelete(req.session.userid)
+        .then(() => {
+            res.redirect("/register");
+        })
+        .catch((err) => console.log("error in profileDelete"));
 });*/
 
 //this if statement makes sure that our server does not fully run when we run our tests
