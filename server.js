@@ -345,7 +345,11 @@ app.post("/logout", (req, res) => {
 app.get("/", (req, res) => {
     res.redirect("/register");
 });
-app.post("/deleteaccount", (req, res) => {});
+/*app.post("/deleteaccount", (req, res) => {
+    db.userDelete();
+    db.sigDelete();
+    db.profileDelete();
+});*/
 
 //this if statement makes sure that our server does not fully run when we run our tests
 if (require.main == module) {
