@@ -1,32 +1,38 @@
 <form method="POST">
 <body>
-    <form action="/profile" method="post">
- <div>
 
-    <label for="last">age:</label>
+    <form action="/profile" method="post">
+
+    <div class="register">
+
+
+    
+ <div>
     <input type="int" id="age" name="age">
+    <label for="last">age</label>
  </div>
   <div>
 
-    <label for="email">city:</label>
     <input type="text" id="city" name="city">
+    <label for="email">city</label>
   </div>
   <div>
 
-    <label for="email">url:</label>
     <input type="text" id="url" name="url">
+    <label for="email">url</label>
   </div>
   <div>
 
-    <label for="first">id:</label>
+    <label for="first"></label>
     <input type="hidden" id="id" name="user_id">
   </div>
   
   <input type="hidden" name="_csrf" value="{{csrfToken}}">
  
-    <input type="submit" value="submit">
+    <input type="submit"  value="submit">
 
   <div><p>would you like to <a href="/edit">edit</a> your profile?  </p></div>
+  </div>
 </form>
 </body>
 </form>

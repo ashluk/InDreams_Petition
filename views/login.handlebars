@@ -1,15 +1,19 @@
 <form method="POST">
 <body>
     <form action="/login" method="post">
+ <div class="register">
+
+
+ 
  <div>
 
-    <label for="email">Email:</label>
     <input type="text" id="email" name="email">
+    <label for="email">Email</label>
  </div>
   <div>
 
-    <label for="password">Password:</label>
     <input type="password" id="password" name="password_hash">
+    <label for="password">Password</label>
   </div>
   <div>
 
@@ -17,7 +21,7 @@
         <!---  <button type="button" class="button clear" data-action="clear">clear</button>
                   <button type="sumbit" class="submit" data-action="submit">submit</button> -->
   </div>
-
+</div>
   
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 

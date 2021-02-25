@@ -1,26 +1,29 @@
 
 <!--<h3>Thank you for signing, you are number {{>count}}</h3>-->
+<div class="titles">
 {{#signerNumber}}
-<h3> {{count}} others share your vote for a new heirarchy of reality </h3>
+<a href="/signers">
+      <h3> thank you! <br> would you like to see the {{count}} others who share your vision of <em>psychic reality</em> ? </h3></a>
 {{/signerNumber}}
-
+</div>
 {{#signatureImage}}
-<img src="{{signature}}" alt="signature">
+<img src="{{signature}}" id='sigdraw' alt="signature">
 {{/signatureImage}}
 
 <!---{{#rows}}
 <h3> are number {{count}}</h3>
 <img src="{{signature}}" alt="signature">
 {{/rows}}-->
-    <div><p>would you like to create a <a href="/profile">profile</a>?  </p></div>
 
 
- <a href="/signers"><button>SIGNERS</button></a>   
+  
  <div></div>
  <form method="POST">
  <form action="/delete" method="POST">
   <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-<button>DELETE SIGNATURE</button>
+  <div class='editprofile'><p>would you like to <a href="/edit">edit</a> your profile?  </p></div>
+
+<button class='delete'>DELETE SIGNATURE</button>
  </form>
  </form>

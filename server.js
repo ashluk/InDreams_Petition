@@ -88,7 +88,7 @@ app.post("/register", (req, res) => {
                     console.log("rows: ", rows);
                     req.session.userid = rows[0].id;
 
-                    res.redirect("/login");
+                    res.redirect("/profile");
                 })
                 .catch((err) => {
                     console.log("register error", err);
@@ -172,13 +172,17 @@ app.get("/profile", (req, res) => {
 //check that the url the user provided starts with either https:// or http://, if not, add that to whatever they provided!
 
 app.post("/profile", (req, res) => {
-    const { age, city, url, user_id } = req.body;
+    const { age, city, user_id } = req.body;
     console.log("age,city,url, user_id", req.body);
+    let url = req.body.url;
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+    }
     db.addUser(age, city, url, req.session.userid)
         .then(({ rows }) => {
             console.log("adduser", rows);
             //req.session.userid = rows[0].id;
-            res.redirect("/signers");
+            res.redirect("/petition");
         })
         .catch((err) => {
             console.log("error in profile", err);
@@ -218,54 +222,32 @@ app.post("/edit", (req, res) => {
         password_hash,
         age,
         city,
-        url,
         id,
     } = req.body;
+    let url = req.body.url;
     console.log("edit info", req.body.password_hash);
+    console.log("oops these match", password_hash);
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+    }
+    console.log("what is my", url);
     if (req.body.password_hash) {
         hash(password_hash)
             .then((hashedPassword) => {
                 db.editUserPass(
-                    req.body.user_first,
-                    req.body.user_last,
-                    req.body.email,
-                    req.body.password_hash,
-                    req.body.id
+                    user_first,
+                    user_last,
+                    email,
+                    password_hash,
+                    req.session.userid
                 )
-                    .then(() => {
-                        db.userUpsert(
-                            req.body.age,
-                            req.body.city,
-                            req.body.url,
-                            req.body.id
-                        ).then(() => {
-                            res.render("edit");
-                            res.redirect("/profile");
-                        });
-                    })
+                    .then(() => {})
                     .catch((err) => {
                         console.log("err in userPass", err);
                     });
-            })
-            .catch((err) => {
-                console.log("err in hashedPass", err);
-            });
-    } else {
-        db.editUserNoPass(
-            req.body.user_first,
-            req.body.user_last,
-            req.body.email,
-            req.body.id
-        )
-            .then(() => {
-                db.userUpsert(
-                    req.body.age,
-                    req.body.city,
-                    req.body.url,
-                    req.body.id
-                )
+                db.userUpsert(age, city, url, req.session.userid)
                     .then(() => {
-                        res.render("edit");
+                        // res.render("edit");
                         res.redirect("/profile");
                     })
                     .catch((err) => {
@@ -273,33 +255,27 @@ app.post("/edit", (req, res) => {
                     });
             })
             .catch((err) => {
+                console.log("err in hashedPass", err);
+            });
+    } else {
+        db.editUserNoPass(user_first, user_last, email, req.session.userid)
+            .then(() => {})
+            .catch((err) => {
                 console.log("err in userNoPass", err);
+            });
+        db.userUpsert(age, city, url, req.session.userid)
+            .then(() => {
+                //res.render("edit");
+                res.redirect("/profile");
+            })
+            .catch((err) => {
+                console.log("err in userUpsert2", err);
             });
     }
     //res.render("edit");
 });
-/*app.post("/edit", (req, res) => {
-    const {user_first, user_last, email, password_hash, age, city, url} = req.body
-    if (password_hash) {
-        hash(password_hash)
-        .then((hashedPassword) => {
-            db.addUserInput(user_first, user_last, email, hashedPassword)
-                .then(({ rows }) => {
-                    console.log("rows: ", rows);
-                    req.session.userid = rows[0].id;
-                }).catch((err) => {
-                    res.render('edit')
-                })
-        // hash the new password
-        // update 4 columns in users table
-        // run upsert for user_profiles
-    } else {
-        // update 3 columns in users table
-        // run upsert for user_profiles
-    }
-});*/
 
-///////////////
+//THANK YOU ROUTE
 
 app.get("/signers", (req, res) => {
     db.getSigners()
@@ -330,10 +306,6 @@ app.get("/thanks", (req, res) => {
             .then(({ rows }) => {
                 console.log("rows: ", rows);
                 var signatureImage = rows[0];
-                //console.log("signatureImage", signatureImage);
-                /*res.render("thanks", {
-                    rows,
-                });*/
                 db.getCount().then(({ rows }) => {
                     var signerNumber = rows[0];
                     console.log("signerNumber", signerNumber);
@@ -350,12 +322,18 @@ app.get("/thanks", (req, res) => {
     }
 });
 
-app.get("/delete", (req, res) => {
+app.post("/thanks", (req, res) => {
     console.log("looking for signature id", req.session);
-    db.sigDelete(req.session.userid).then(() => {
-        req.session.signed = undefined;
-        res.redirect("/petition");
-    });
+    db.sigDelete(req.session.userid)
+        .then(() => {
+            req.session.signed = undefined;
+            res.redirect("/petition");
+        })
+        .catch((err) => console.log("error in delete", err));
+});
+
+app.get("/logout", (req, res) => {
+    res.redirect("register");
 });
 
 app.get("/", (req, res) => {

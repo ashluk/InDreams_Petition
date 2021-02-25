@@ -108,7 +108,7 @@ module.exports.getUserProfile = (userid) => {
 //no pass === three
 
 //does require.body.pass exist if soo call the one with password
-module.exports.editUserPass = (
+/*module.exports.editUserPass = (
     userfirst,
     userlast,
     useremail,
@@ -118,39 +118,47 @@ module.exports.editUserPass = (
     const q = `
     UPDATE users 
     SET 
-    user_first = $1
-    user_last = $2
-    email = $3
+    user_first = $1,
+    user_last = $2,
+    email = $3,
     password_hash = $4
-    WHERE user_id = $5`;
+    WHERE id = $5`;
+    const params = [userfirst, userlast, useremail, userpass, userid];
+    return db.query(q, params);
+};*/
+
+module.exports.editUserPass = (
+    userfirst,
+    userlast,
+    useremail,
+    userpass,
+    userid
+) => {
+    const q = `UPDATE users SET user_first = $1, user_last = $2, email = $3, password_hash = $4 WHERE id = $5`;
     const params = [userfirst, userlast, useremail, userpass, userid];
     return db.query(q, params);
 };
+
 module.exports.editUserNoPass = (userfirst, userlast, useremail, userid) => {
     const q = `
-    UPDATE users 
-    SET 
-    user_first = $1
-    user_last = $2
-    email = $3
-    WHERE user_id = $4`;
+    UPDATE users
+    SET user_first = $1, user_last = $2, email = $3 WHERE id = $4`;
     const params = [userfirst, userlast, useremail, userid];
     return db.query(q, params);
 };
 
 module.exports.userUpsert = (userage, usercity, userurl, userid) => {
-    const q = `
-    INSERT INTO user_profiles (age, city, url, user_id)
-    VALUES = age, city, url
+    const q = `INSERT INTO user_profiles (age, city, url, user_id)
+    VALUES  ($1, $2, $3, $4)
     ON CONFLICT (user_id)
-    DO UPDATE SET age = $1, city = $2, url = $3  `;
+    DO UPDATE SET age = $1, city = $2, url = $3`;
     const params = [userage, usercity, userurl, userid];
     return db.query(q, params);
 };
 
 module.exports.sigDelete = (userid) => {
     const q = `
-    DELETE FROM signature WHERE id = $1`;
+    DELETE FROM signatures WHERE user_id = $1`;
     const params = [userid];
     return db.query(q, params);
 };
