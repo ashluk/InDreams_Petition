@@ -248,7 +248,7 @@ app.post("/edit", (req, res) => {
                 db.userUpsert(age, city, url, req.session.userid)
                     .then(() => {
                         // res.render("edit");
-                        res.redirect("/profile");
+                        res.redirect("/signers");
                     })
                     .catch((err) => {
                         console.log("err in userUpsert", err);
@@ -266,7 +266,7 @@ app.post("/edit", (req, res) => {
         db.userUpsert(age, city, url, req.session.userid)
             .then(() => {
                 //res.render("edit");
-                res.redirect("/profile");
+                res.redirect("/signers");
             })
             .catch((err) => {
                 console.log("err in userUpsert2", err);
@@ -332,13 +332,16 @@ app.post("/thanks", (req, res) => {
         .catch((err) => console.log("error in delete", err));
 });
 
-app.get("/logout", (req, res) => {
+app.post("/logout", (req, res) => {
+    req.session = undefined;
+    //req.session.id = undefined;
     res.redirect("register");
 });
 
 app.get("/", (req, res) => {
     res.redirect("/register");
 });
+app.post("/deleteaccount", (req, res) => {});
 
 //this if statement makes sure that our server does not fully run when we run our tests
 if (require.main == module) {

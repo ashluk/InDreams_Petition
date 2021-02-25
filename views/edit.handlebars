@@ -2,7 +2,7 @@
 <body>
     <form action="/edit" method="post">
 
-     <h1>EDIT YOUR PROFILE</h1>
+     <div class='edityourprofile'></div><h1>EDIT YOUR PROFILE</h1>
 {{#currentUser}}
 
 <div class="register">
@@ -46,7 +46,7 @@
   
       {{/currentUser}}
  
-
+     
     <input type="submit"  value="submit">
     </div>
         <!---  <button type="button" class="button clear" data-action="clear">clear</button>
@@ -56,5 +56,13 @@
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
 </form>
+
 </body>
+</form>
+<form method="POST"></form>
+<form action="/logout" method="post">
+<button>LOGOUT</button>
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+</form>
 </form>

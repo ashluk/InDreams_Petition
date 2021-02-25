@@ -154,8 +154,8 @@ button.delete {
     position: absolute;
     top: 10px;
     right: 20px;
-    width: 600px;
-    height: 600px;
+    width: 500px;
+    height: 500px;
     -webkit-animation: spin 15s linear infinite;
     animation: spin 10s linear infinite;
 }
