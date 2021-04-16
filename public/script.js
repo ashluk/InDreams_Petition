@@ -33,7 +33,7 @@ window.addEventListener("mouseup", (e) => {
 
         moving = false;
         var dataURL = signature.toDataURL();
-        hidden.value = dataURL;
+        hidden.value = dataURL; 
         console.log("this is my dataURL", dataURL);
     }
 });

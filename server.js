@@ -111,7 +111,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
     //const { email, password } = req.body;
 
-    const password = req.body.password_hash;
+    const password = req.body.password;
     const email = req.body.email;
     console.log("email, password", req.body);
     /*if (!req.session.userid) {
@@ -345,7 +345,7 @@ app.post("/logout", (req, res) => {
 app.get("/", (req, res) => {
     res.redirect("/register");
 });
-/*app.get("/deleteaccount", (req, res) => {
+app.get("/deleteaccount", (req, res) => {
     db.userDelete(req.session.userid)
         .then(() => {})
         .catch((err) => console.log("error in userDelete"));
@@ -357,7 +357,7 @@ app.get("/", (req, res) => {
             res.redirect("/register");
         })
         .catch((err) => console.log("error in profileDelete"));
-});*/
+});
 
 //this if statement makes sure that our server does not fully run when we run our tests
 if (require.main == module) {
